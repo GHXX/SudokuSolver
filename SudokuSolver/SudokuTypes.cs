@@ -49,5 +49,10 @@ namespace SudokuSolver
         public List<int> GetPossibleValues => possibleValues;
         public bool IsDirty => isDirty;
         public bool IsFinished => isFinished;
+
+        public string GetShort()
+        {
+            return this.GetPossibleValues.Count > 1 ? "#" : this.GetPossibleValues[0].ToString();
+        }
     }
 }

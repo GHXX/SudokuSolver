@@ -20,9 +20,12 @@ namespace SudokuSolver
         }
 
         private void MainForm_Load(object sender, EventArgs e)
+        {       
+        }
+
+        private void Btn_Calc_Click(object sender, EventArgs e)
         {
             solver = new Solver(panel_SudokuMainArea);
-
             solver.Start();
         }
     }

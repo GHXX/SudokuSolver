@@ -8,6 +8,8 @@ namespace SudokuSolver
     {
         SudokuNumberStack[,] data;
         readonly int[] Arr1to9 = new int[] { 1, 2, 3, 4, 5, 6, 7, 8, 9 };
+        public SudokuNumberStack[,] Data => data;
+
 
         public SudokuContents(int[,] knownValues)
         {
@@ -128,7 +130,7 @@ namespace SudokuSolver
                 }
             }
 
-            // reqcheck 3x3 squares
+            // recheck 3x3 squares
             for (int i = 0; i < 9; i++)
             {
                 int offsetX = (i % 3) * 3;
@@ -144,7 +146,7 @@ namespace SudokuSolver
                             finished.Add(number.GetPossibleValues[0]);
                     }
                 }
-
+                // TODO add small square check for most common elimination method
                 if (finished.Count == 8)
                 {
                     for (int l = 0; l < 3; l++) // lines
