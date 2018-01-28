@@ -15,6 +15,11 @@ namespace SudokuSolver
             possibleValues = new List<int> { 1, 2, 3, 4, 5, 6, 7, 8, 9 };
         }
 
+        public override string ToString()
+        {
+            return $"{(string.Join(",", possibleValues))}";
+        }
+
         public void EliminateNumber(int number)
         {
             if (!isFinished)
@@ -23,6 +28,10 @@ namespace SudokuSolver
                 {
                     possibleValues.Remove(number);
                     isDirty = true;
+                    if (possibleValues.Count == 1)
+                    {
+                        isFinished = true;
+                    }
                 }
                 else
                 {
@@ -37,9 +46,12 @@ namespace SudokuSolver
 
         internal void SetDirty() => isDirty = true;
 
-        public void SetNumber(int number)
+        public void SetNumber(int number, bool force = false)
         {
-
+            if (IsFinished && !force)
+            {
+                throw new InvalidOperationException("Cannot set number if finished already!");
+            }
             possibleValues.Clear();
             possibleValues.Add(number);
             isFinished = true;
@@ -49,6 +61,8 @@ namespace SudokuSolver
         public List<int> GetPossibleValues => possibleValues;
         public bool IsDirty => isDirty;
         public bool IsFinished => isFinished;
+
+        public void MarkClean() => isDirty = false;
 
         public string GetShort()
         {

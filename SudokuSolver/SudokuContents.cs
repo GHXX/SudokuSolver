@@ -9,19 +9,20 @@ namespace SudokuSolver
         SudokuNumberStack[,] data;
         readonly int[] Arr1to9 = new int[] { 1, 2, 3, 4, 5, 6, 7, 8, 9 };
         public SudokuNumberStack[,] Data => data;
-
+        int iteration = 0;
+        int[] debug = { -1, -1 }; // -1 = disabled
 
         public SudokuContents(int[,] knownValues)
         {
             data = new SudokuNumberStack[9, 9];
-            for (int i = 0; i < 9; i++)
+            for (int px = 0; px < 9; px++)
             {
-                for (int j = 0; j < 9; j++)
+                for (int py = 0; py < 9; py++)
                 {
-                    data[i, j] = new SudokuNumberStack();
-                    if (knownValues[i,j] != 0)
+                    data[px, py] = new SudokuNumberStack();
+                    if (knownValues[px, py] != 0)
                     {
-                        data[i, j].SetNumber(knownValues[i, j]);
+                        data[px, py].SetNumber(knownValues[px, py]);
                     }
                 }
             }
@@ -29,52 +30,52 @@ namespace SudokuSolver
 
         public bool RecheckValues()
         {
+            iteration++;
             bool checkChanged = false;
 
             if (checkChanged) // recalc
                 return true;
 
-            // recheck lines
-            for (int i = 0; i < 9; i++)
+            // recheck columns
+            for (int py = 0; py < 9; py++)
             {
-                // eliminate values
-                for (int k = 0; k < 9; k++) // columns
+                for (int px = 0; px < 9; px++) // columns
                 {
-                    if (!data[i, k].IsFinished)
+                    if (!data[px, py].IsFinished)
                     {
-                        var number = data[i, k];
+                        var number = data[px, py];
                         var ColumnVals = new List<int>();
 
-                        for (int l = 0; l < 9; l++)
+                        for (int py2 = 0; py2 < 9; py2++)
                         {
-                            if (data[l, k].IsFinished)
-                                ColumnVals.Add(data[l, k].GetPossibleValues[0]);
+                            if (data[px, py2].IsFinished)
+                                ColumnVals.Add(data[px, py2].GetPossibleValues[0]);
                         }
 
 
-                        foreach (var num in data[i, k].GetPossibleValues.Where(x => ColumnVals.Contains(x)).ToList())
+                        foreach (var num in data[px, py].GetPossibleValues.Where(x => ColumnVals.Contains(x)).ToList())
                         {
-                            data[i, k].EliminateNumber(num);
+                            data[px, py].EliminateNumber(num);
                             checkChanged = true;
                         }
                     }
                 }
 
-                // count finished values
+                // count finished in line
                 var finished = new List<int>();
-                for (int k = 0; k < 9; k++)
+                for (int px = 0; px < 9; px++)
                 {
-                    if (data[i, k].IsFinished)
-                        finished.Add(data[i, k].GetPossibleValues[0]);
+                    if (data[px, py].IsFinished)
+                        finished.Add(data[px, py].GetPossibleValues[0]);
                 }
                 if (finished.Count == 8)
                 {
-                    for (int k = 0; k < 9; k++)
+                    for (int px = 0; px < 9; px++)
                     {
-                        if (!data[i, k].IsFinished)
+                        if (!data[px, py].IsFinished)
                         {
-                            data[i, k].SetNumber(Arr1to9.Except(finished).First());
-                            data[i, k].SetDirty();
+                            data[px, py].SetNumber(Arr1to9.Except(finished).First());
+                            data[px, py].SetDirty();
                             checkChanged = true;
                             break;
                         }
@@ -82,47 +83,51 @@ namespace SudokuSolver
                 }
             }
 
-            // recheck columns
-            for (int k = 0; k < 9; k++)
+            if (checkChanged)
+                return true;
+
+
+            // recheck lines
+            for (int px = 0; px < 9; px++)
             {
                 // eliminate values
-                for (int i = 0; i < 9; i++) // lines
+                for (int py = 0; py < 9; py++) // lines
                 {
-                    if (!data[i, k].IsFinished) // if unknown
+                    if (!data[px, py].IsFinished) // if unknown
                     {
-                        var number = data[i, k];
+                        var number = data[px, py];
                         var ColumnVals = new List<int>();
 
-                        for (int l = 0; l < 9; l++)
+                        for (int px2 = 0; px2 < 9; px2++)
                         {
-                            if (data[l, k].IsFinished)
-                                ColumnVals.Add(data[l, k].GetPossibleValues[0]);
+                            if (data[px2, py].IsFinished)
+                                ColumnVals.Add(data[px2, py].GetPossibleValues[0]);
                         }
 
 
-                        foreach (var num in data[i, k].GetPossibleValues.Where(x => ColumnVals.Contains(x)).ToList())
+                        foreach (var num in data[px, py].GetPossibleValues.Where(x => ColumnVals.Contains(x)).ToList())
                         {
-                            data[i, k].EliminateNumber(num);
+                            data[px, py].EliminateNumber(num);
                             checkChanged = true;
                         }
                     }
                 }
 
-                // count finished values
+                // count finished in column
                 var finished = new List<int>();
-                for (int i = 0; i < 9; i++)
+                for (int py = 0; py < 9; py++)
                 {
-                    if (data[i, k].IsFinished)
-                        finished.Add(data[i, k].GetPossibleValues[0]);
+                    if (data[px, py].IsFinished)
+                        finished.Add(data[px, py].GetPossibleValues[0]);
                 }
                 if (finished.Count == 8)
                 {
-                    for (int i = 0; i < 9; i++)
+                    for (int py = 0; py < 9; py++)
                     {
-                        if (!data[i, k].IsFinished)
+                        if (!data[px, py].IsFinished)
                         {
-                            data[i, k].SetNumber(Arr1to9.Except(finished).First());
-                            data[i, k].SetDirty();
+                            data[px, py].SetNumber(Arr1to9.Except(finished).First());
+                            data[px, py].SetDirty();
                             checkChanged = true;
                             break;
                         }
@@ -131,38 +136,95 @@ namespace SudokuSolver
             }
 
             // recheck 3x3 squares
-            for (int i = 0; i < 9; i++)
+            for (int square = 0; square < 9; square++)
             {
-                int offsetX = (i % 3) * 3;
-                int offsetY = (i / 3) * 3;
+                int offsetX = (square % 3) * 3;
+                int offsetY = (square / 3) * 3;
+
                 var finished = new List<int>();
 
-                for (int l = 0; l < 3; l++) // lines
+                for (int line = 0; line < 3; line++) // lines
                 {
-                    for (int c = 0; c < 3; c++) // columns
+                    for (int column = 0; column < 3; column++) // columns
                     {
-                        var number = data[offsetY + l, offsetX + c];
+                        var number = data[offsetX + column, offsetY + line];
                         if (number.IsFinished)
                             finished.Add(number.GetPossibleValues[0]);
                     }
                 }
-                // TODO add small square check for most common elimination method
+
+                // eliminate numbers that are filled in already
+                for (int py = 0; py < 3; py++) // lines
+                {
+                    for (int px = 0; px < 3; px++) // columns
+                    {
+                        foreach (var item in finished)
+                        {
+                            if (!data[offsetX + px, offsetY + py].IsFinished && data[offsetX + px, offsetY + py].GetPossibleValues.Contains(item))
+                            {
+                                data[offsetX + px, offsetY + py].EliminateNumber(item);
+                                checkChanged = true;
+                            }
+                        }
+                    }
+                }
+                // ----------------------------
+
+
+                // finish 8 out of 9 squares
+
                 if (finished.Count == 8)
                 {
-                    for (int l = 0; l < 3; l++) // lines
+                    for (int py = 0; py < 3; py++) // lines
                     {
-                        for (int c = 0; c < 3; c++) // columns
+                        for (int px = 0; px < 3; px++) // columns
                         {
-                            var number = data[offsetY + l, offsetX + c];
-                            if (data[offsetY + l, offsetX + c].IsFinished)
+                            var number = data[offsetX + px, offsetY + py];
+                            if (!data[offsetX + px, offsetY + py].IsFinished)
                             {
-                                data[offsetY + l, offsetX + c].SetNumber(Arr1to9.Except(finished).First());
-                                data[offsetY + l, offsetX + c].SetDirty();
+                                data[offsetX + px, offsetY + py].SetNumber(Arr1to9.Except(finished).First());
+                                data[offsetX + px, offsetY + py].SetDirty();
                                 checkChanged = true;
                                 break;
                             }
                         }
                     }
+                }
+                else // set number if nowhere else possible
+                {
+                    var slotValues = new List<SudokuNumberStack>();
+                    for (int py = 0; py < 3; py++) // lines
+                    {
+                        for (int px = 0; px < 3; px++) // columns
+                        {
+                            slotValues.Add(data[offsetX + px, offsetY + py]);
+                        }
+                    }
+
+                    var setWherePossible = new List<int>();
+                    for (int n = 1; n <= 9; n++)
+                    {
+                        if (!slotValues.Any(y => y.IsFinished && y.GetPossibleValues[0] == n) && slotValues.Count(x => x.GetPossibleValues.Contains(n)) == 1)
+                        {
+                            setWherePossible.Add(n);
+                        }
+                    }
+
+                    foreach (var item in setWherePossible)
+                    {
+                        for (int py = 0; py < 3; py++) // lines
+                        {
+                            for (int px = 0; px < 3; px++) // columns
+                            {
+                                if (data[offsetX + px, offsetY + py].GetPossibleValues.Contains(item))
+                                {
+                                    data[offsetX + px, offsetY + py].SetNumber(item);
+                                    checkChanged = true;
+                                }
+                            }
+                        }
+                    }
+
                 }
             }
 
