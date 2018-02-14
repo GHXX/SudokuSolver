@@ -20,11 +20,10 @@ namespace SudokuSolver
         {
             p = panel;
             var knownValues = new int[9, 9];
+            int sudokuIndex = 2;
             // x,y
-            if ("str".Length == 3 && true)
+            if (sudokuIndex == 0)
             {
-
-
                 knownValues[0, 0] = 7;
                 knownValues[3, 0] = 6;
                 knownValues[8, 0] = 2;
@@ -55,7 +54,7 @@ namespace SudokuSolver
                 knownValues[5, 8] = 1;
                 knownValues[8, 8] = 7;
             }
-            else
+            else if (sudokuIndex == 1)
             {
                 knownValues[0, 1] = 3;
                 knownValues[0, 8] = 1;
@@ -84,6 +83,39 @@ namespace SudokuSolver
                 knownValues[8, 0] = 6;
                 knownValues[8, 7] = 4;
             }
+            else if (sudokuIndex == 2)
+            {
+                knownValues[2, 0] = 2;
+                knownValues[6, 0] = 1;
+                knownValues[2, 1] = 5;
+                knownValues[3, 1] = 7;
+                knownValues[4, 1] = 2;
+                knownValues[5, 1] = 1;
+                knownValues[6, 1] = 8;
+                knownValues[0, 2] = 3;
+                knownValues[8, 2] = 6;
+                knownValues[4, 3] = 5;
+                knownValues[0, 4] = 7;
+                knownValues[8, 4] = 2;
+                knownValues[1, 5] = 3;
+                knownValues[3, 5] = 4;
+                knownValues[5, 5] = 6;
+                knownValues[7, 5] = 8;
+                knownValues[0, 6] = 6;
+                knownValues[3, 6] = 2;
+                knownValues[5, 6] = 9;
+                knownValues[8, 6] = 5;
+                knownValues[2, 7] = 9;
+                knownValues[6, 7] = 6;
+                knownValues[0, 8] = 1;
+                knownValues[3, 8] = 5;
+                knownValues[5, 8] = 4;
+                knownValues[8, 8] = 7;
+            }
+            else
+            {
+                throw new InvalidOperationException("Invalid sudoku index");
+            }
             content = new SudokuContents(knownValues);
             UpdateDrawing();
         }
@@ -104,6 +136,7 @@ namespace SudokuSolver
             UpdateDrawing();
         }
 
+        const int size = 60;
         private void UpdateDrawing()
         {
             p.Invoke((MethodInvoker)delegate
@@ -115,10 +148,10 @@ namespace SudokuSolver
                     {
                         var l = new Label
                         {
-                            Size = new Size(12, 12),
-                            Text = (this.content?.Data[px, py].GetShort() ?? "?").ToString(),
+                            Size = new Size((int)(size), 12),
+                            Text = (this.content?.Data[px, py].GetShort(true) ?? "?").ToString(),
                             ForeColor = (this.content?.Data[px, py].IsDirty != false) ? Color.Red : Color.Black,
-                            Location = new Point(px * 24, py * 24)
+                            Location = new Point((px + px / 3) * size, (py + py / 3) * size)
                         };
                         l.Show();
                         p.Controls.Add(l);

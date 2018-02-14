@@ -64,9 +64,9 @@ namespace SudokuSolver
 
         public void MarkClean() => isDirty = false;
 
-        public string GetShort()
+        public string GetShort(bool listAllValues)
         {
-            return this.GetPossibleValues.Count > 1 ? "#" : this.GetPossibleValues[0].ToString();
+            return this.GetPossibleValues.Count > 1 ? (listAllValues?$"{{{string.Join(",",this.GetPossibleValues)}}}":"#") : this.GetPossibleValues[0].ToString();
         }
     }
 }
