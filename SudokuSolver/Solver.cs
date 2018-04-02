@@ -136,7 +136,7 @@ namespace SudokuSolver
             UpdateDrawing();
         }
 
-        const int size = 60;
+        const int size = 40;
         private void UpdateDrawing()
         {
             bool valid = this.content.IsValid();
