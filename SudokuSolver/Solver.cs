@@ -167,9 +167,10 @@ namespace SudokuSolver
             UpdateDrawing();
         }
 
-        const int size = 60;
+        const int size = 40;
         private void UpdateDrawing()
         {
+            bool valid = this.content.IsValid();
             p.Invoke((MethodInvoker)delegate
             {
                 p.Controls.Clear();
@@ -189,6 +190,9 @@ namespace SudokuSolver
                         this.content?.Data[px, py].MarkClean();
                     }
                 }
+                var lblControl = p.Parent.Controls.Find("lblValid", false).First();
+                lblControl.Text = "Valid: " + (valid ? "True" : "False");
+                lblControl.ForeColor = valid ? Color.Green : Color.Red;
                 p.Update();
             });
         }

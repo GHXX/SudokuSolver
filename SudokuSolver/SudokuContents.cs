@@ -12,6 +12,61 @@ namespace SudokuSolver
         int iteration = 0;
         int[] debug = { -1, -1 }; // -1 = disabled
 
+        public SudokuNumberStack[] GetLine(int index)
+        {
+            var ret = new List<SudokuNumberStack>();
+            for (int i = 0; i < 9; i++)
+            {
+                ret.Add(data.GetValue(i, index) as SudokuNumberStack);
+            }
+            return ret.ToArray();
+        }
+
+        public SudokuNumberStack[] GetColumn(int index)
+        {
+            var ret = new List<SudokuNumberStack>();
+            for (int i = 0; i < 9; i++)
+            {
+                ret.Add(data.GetValue(index, i) as SudokuNumberStack);
+            }
+            return ret.ToArray();
+        }
+
+        public SudokuNumberStack[] GetSquare(int index) // 0 - 8
+        {
+            var ret = new List<SudokuNumberStack>();
+            for (int i = 0; i < 9; i++)
+            {
+                ret.Add(data.GetValue((index % 3) * 3 + i % 3, (index / 3) * 3 + i / 3) as SudokuNumberStack);
+            }
+            return ret.ToArray();
+        }
+
+        public bool IsValid()
+        {
+            for (int i = 0; i < 9; i++)
+            {
+                var ln = this.GetLine(i).Where(x => x.IsFinished);
+                if (ln.Distinct().Count() != ln.Count())
+                {
+                    return false;
+                }
+
+                var col = this.GetColumn(i).Where(x => x.IsFinished);
+                if (col.Distinct().Count() != col.Count())
+                {
+                    return false;
+                }
+
+                var sq = this.GetSquare(i).Where(x => x.IsFinished);
+                if (sq.Distinct().Count() != sq.Count())
+                {
+                    return false;
+                }
+            }
+            return true;
+        }
+
         public SudokuContents(int[,] knownValues)
         {
             data = new SudokuNumberStack[9, 9];
