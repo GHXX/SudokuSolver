@@ -85,6 +85,37 @@ namespace SudokuSolver
             }
             else if (sudokuIndex == 2)
             {
+                knownValues[0, 0] = 5;
+                knownValues[1, 0] = 2;
+                knownValues[6, 1] = 4;
+                knownValues[7, 1] = 9;
+                knownValues[8, 1] = 6;
+                knownValues[3, 2] = 3;
+                knownValues[4, 2] = 4;
+                knownValues[5, 2] = 8;
+                knownValues[1, 3] = 3;
+                knownValues[5, 3] = 9;
+                knownValues[8, 3] = 7;
+                knownValues[2, 4] = 2;
+                knownValues[3, 4] = 4;
+                knownValues[4, 4] = 5;
+                knownValues[5, 4] = 1;
+                knownValues[8, 4] = 3;
+                knownValues[0, 5] = 4;
+                knownValues[1, 5] = 5;
+                knownValues[2, 5] = 6;
+                knownValues[4, 5] = 8;
+                knownValues[6, 6] = 2;
+                knownValues[7, 6] = 6;
+                knownValues[0, 7] = 9;
+                knownValues[2, 7] = 1;
+                knownValues[2, 8] = 5;
+                knownValues[3, 8] = 9;
+                knownValues[4, 8] = 7;
+                knownValues[5, 8] = 4;
+            }
+            else if (sudokuIndex == 3)
+            {
                 knownValues[2, 0] = 2;
                 knownValues[6, 0] = 1;
                 knownValues[2, 1] = 5;
