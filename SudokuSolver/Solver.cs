@@ -143,6 +143,35 @@ namespace SudokuSolver
                 knownValues[5, 8] = 4;
                 knownValues[8, 8] = 7;
             }
+            else if (sudokuIndex == 4)
+            {
+                knownValues[2, 0] = 8;
+                knownValues[4, 0] = 5;
+                knownValues[7, 0] = 4;
+                knownValues[1, 1] = 5;
+                knownValues[2, 1] = 1;
+                knownValues[3, 1] = 4;
+                knownValues[4, 1] = 8;
+                knownValues[8, 1] = 2;
+                knownValues[2, 2] = 4;
+                knownValues[4, 2] = 6;
+                knownValues[5, 2] = 2;
+                knownValues[6, 3] = 8;
+                knownValues[2, 4] = 5;
+                knownValues[6, 4] = 1;
+                knownValues[7, 4] = 3;
+                knownValues[8, 4] = 7;
+                knownValues[0, 5] = 1;
+                knownValues[1, 5] = 4;
+                knownValues[7, 5] = 9;
+                knownValues[4, 6] = 3;
+                knownValues[6, 6] = 4;
+                knownValues[7, 6] = 7;
+                knownValues[8, 6] = 1;
+                knownValues[3, 7] = 6;
+                knownValues[7, 7] = 5;
+                knownValues[3, 8] = 2;
+            }
             else
             {
                 throw new InvalidOperationException("Invalid sudoku index");
