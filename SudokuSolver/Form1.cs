@@ -1,11 +1,4 @@
 ﻿using System;
-using System.Collections.Generic;
-using System.ComponentModel;
-using System.Data;
-using System.Drawing;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 using System.Windows.Forms;
 
 namespace SudokuSolver
@@ -21,12 +14,22 @@ namespace SudokuSolver
 
         private void MainForm_Load(object sender, EventArgs e)
         {
-            solver = new Solver(panel_SudokuMainArea);
+            this.solver = new Solver(this.panel_SudokuMainArea);
         }
 
         private void Btn_Calc_Click(object sender, EventArgs e)
         {
-            solver.Start();
+            this.solver.Start();
+        }
+
+        private void Btn_Load_Click(object sender, EventArgs e)
+        {
+            var inForm = new InputForm();
+            var result = inForm.ShowDialog(this);
+            if (result == DialogResult.OK)
+            {
+                this.solver.Load(inForm.result);
+            }
         }
     }
 }

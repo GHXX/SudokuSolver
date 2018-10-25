@@ -180,6 +180,12 @@ namespace SudokuSolver
             UpdateDrawing();
         }
 
+        internal void Load(int[,] data)
+        {
+            content = new SudokuContents(data);
+            UpdateDrawing();
+        }
+
         internal void Start()
         {
             SolveCycleMain(); // run on thread

@@ -31,6 +31,7 @@
             this.panel_SudokuMainArea = new System.Windows.Forms.Panel();
             this.btn_Calc = new System.Windows.Forms.Button();
             this.lblValid = new System.Windows.Forms.Label();
+            this.btn_Load = new System.Windows.Forms.Button();
             this.SuspendLayout();
             // 
             // panel_SudokuMainArea
@@ -42,7 +43,7 @@
             // 
             // btn_Calc
             // 
-            this.btn_Calc.Location = new System.Drawing.Point(12, 484);
+            this.btn_Calc.Location = new System.Drawing.Point(113, 484);
             this.btn_Calc.Name = "btn_Calc";
             this.btn_Calc.Size = new System.Drawing.Size(75, 23);
             this.btn_Calc.TabIndex = 1;
@@ -60,11 +61,22 @@
             this.lblValid.TabIndex = 2;
             this.lblValid.Text = "Valid: ?";
             // 
+            // btn_Load
+            // 
+            this.btn_Load.Location = new System.Drawing.Point(12, 484);
+            this.btn_Load.Name = "btn_Load";
+            this.btn_Load.Size = new System.Drawing.Size(75, 23);
+            this.btn_Load.TabIndex = 3;
+            this.btn_Load.Text = "Load...";
+            this.btn_Load.UseVisualStyleBackColor = true;
+            this.btn_Load.Click += new System.EventHandler(this.Btn_Load_Click);
+            // 
             // MainForm
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 13F);
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
             this.ClientSize = new System.Drawing.Size(784, 561);
+            this.Controls.Add(this.btn_Load);
             this.Controls.Add(this.lblValid);
             this.Controls.Add(this.btn_Calc);
             this.Controls.Add(this.panel_SudokuMainArea);
@@ -84,6 +96,7 @@
         private System.Windows.Forms.Panel panel_SudokuMainArea;
         private System.Windows.Forms.Button btn_Calc;
         private System.Windows.Forms.Label lblValid;
+        private System.Windows.Forms.Button btn_Load;
     }
 }
 
