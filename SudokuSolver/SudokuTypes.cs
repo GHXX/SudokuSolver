@@ -1,6 +1,5 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.Linq;
 
 namespace SudokuSolver
 {
@@ -12,25 +11,25 @@ namespace SudokuSolver
 
         public SudokuNumberStack()
         {
-            possibleValues = new List<int> { 1, 2, 3, 4, 5, 6, 7, 8, 9 };
+            this.possibleValues = new List<int> { 1, 2, 3, 4, 5, 6, 7, 8, 9 };
         }
 
         public override string ToString()
         {
-            return $"{(string.Join(",", possibleValues))}";
+            return $"{(string.Join(",", this.possibleValues))}";
         }
 
         public void EliminateNumber(int number)
         {
-            if (!isFinished)
+            if (!this.isFinished)
             {
-                if (possibleValues.Contains(number))
+                if (this.possibleValues.Contains(number))
                 {
-                    possibleValues.Remove(number);
-                    isDirty = true;
-                    if (possibleValues.Count == 1)
+                    this.possibleValues.Remove(number);
+                    this.isDirty = true;
+                    if (this.possibleValues.Count == 1)
                     {
-                        isFinished = true;
+                        this.isFinished = true;
                     }
                 }
                 else
@@ -44,29 +43,29 @@ namespace SudokuSolver
             }
         }
 
-        internal void SetDirty() => isDirty = true;
+        internal void SetDirty() => this.isDirty = true;
 
         public void SetNumber(int number, bool force = false)
         {
-            if (IsFinished && !force)
+            if (this.IsFinished && !force)
             {
                 throw new InvalidOperationException("Cannot set number if finished already!");
             }
-            possibleValues.Clear();
-            possibleValues.Add(number);
-            isFinished = true;
-            isDirty = true;
+            this.possibleValues.Clear();
+            this.possibleValues.Add(number);
+            this.isFinished = true;
+            this.isDirty = true;
         }
 
-        public List<int> GetPossibleValues => possibleValues;
-        public bool IsDirty => isDirty;
-        public bool IsFinished => isFinished;
+        public List<int> PossibleValues => this.possibleValues;
+        public bool IsDirty => this.isDirty;
+        public bool IsFinished => this.isFinished;
 
-        public void MarkClean() => isDirty = false;
+        public void MarkClean() => this.isDirty = false;
 
         public string GetShort(bool listAllValues)
         {
-            return this.GetPossibleValues.Count > 1 ? (listAllValues?$"{{{string.Join(",",this.GetPossibleValues)}}}":"#") : this.GetPossibleValues[0].ToString();
+            return this.PossibleValues.Count > 1 ? (listAllValues ? $"{{{string.Join(",", this.PossibleValues)}}}" : "#") : this.PossibleValues[0].ToString();
         }
     }
 }
