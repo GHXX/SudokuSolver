@@ -2,9 +2,7 @@
 using System.Collections.Generic;
 using System.Drawing;
 using System.Linq;
-using System.Text;
 using System.Threading;
-using System.Threading.Tasks;
 using System.Windows.Forms;
 
 namespace SudokuSolver
@@ -18,7 +16,7 @@ namespace SudokuSolver
 
         public Solver(Panel panel)
         {
-            p = panel;
+            this.p = panel;
             var knownValues = new int[9, 9];
             int sudokuIndex = 2;
             // x,y
@@ -176,13 +174,13 @@ namespace SudokuSolver
             {
                 throw new InvalidOperationException("Invalid sudoku index");
             }
-            content = new SudokuContents(knownValues);
+            this.content = new SudokuContents(knownValues);
             UpdateDrawing();
         }
 
         internal void Load(int[,] data)
         {
-            content = new SudokuContents(data);
+            this.content = new SudokuContents(data);
             UpdateDrawing();
         }
 
@@ -191,10 +189,13 @@ namespace SudokuSolver
             SolveCycleMain(); // run on thread
         }
 
+        [Obsolete]
         void SolveCycleMain()
         {
+            Solve();
+            return;
             UpdateDrawing();
-            while (content.RecheckValues()) // run until done
+            while (this.content.RecheckValues()) // run until done
             {
                 Thread.Sleep(500);
                 UpdateDrawing();
@@ -202,34 +203,89 @@ namespace SudokuSolver
             UpdateDrawing();
         }
 
+        void Solve()
+        {
+            while (this.content.RecheckValues()) { }    // update sudoku
+
+            if (!this.IsSolved && this.IsValid)
+            {
+                var oldContent = new SudokuContents(this.content);
+                int maxVals = 2;
+                for (int x = 0; x < 10; x++)
+                {
+                    for (int y = 0; y < 10; y++)
+                    {
+                        var data = this.content.Data[x, y];
+                        if (!data.IsFinished)
+                        {
+                            var pVals = data.PossibleValues;
+                            if (pVals.Count == maxVals)
+                            {
+                                for (int i = 0; i < pVals.Count; i++)
+                                {
+                                    var newContent = new SudokuContents(oldContent);
+                                    newContent.Data[x, y].SetNumber(pVals[i]);
+                                    this.content = newContent;
+                                    while (this.content.RecheckValues())
+                                    {
+                                        Thread.Sleep(500);
+                                        UpdateDrawing();
+                                    }
+                                    if (this.content.IsSolved())
+                                    {
+                                        UpdateDrawing();
+                                        return;
+                                    }
+                                }
+                            }
+                        }
+                    }
+                }
+                maxVals++;
+                //var subSolver = new Solver(null);
+                //var newContent = new SudokuContents(this.content);
+                //subSolver.Solve();
+                //if (subSolver.IsValid)
+                //{
+                //    this.content = subSolver.content;
+                //}
+            }
+        }
+
+        bool IsSolved => this.content.IsSolved();
+        bool IsValid => this.content.IsValid();
+
         const int size = 40;
         private void UpdateDrawing()
         {
-            bool valid = this.content.IsValid();
-            p.Invoke((MethodInvoker)delegate
+            if (this.p != null)
             {
-                p.Controls.Clear();
-                for (int px = 0; px < 9; px++)
+                bool valid = this.content.IsValid();
+                this.p.Invoke((MethodInvoker)delegate
                 {
-                    for (int py = 0; py < 9; py++)
+                    this.p.Controls.Clear();
+                    for (int px = 0; px < 9; px++)
                     {
-                        var l = new Label
+                        for (int py = 0; py < 9; py++)
                         {
-                            Size = new Size((int)(size), 12),
-                            Text = (this.content?.Data[px, py].GetShort(true) ?? "?").ToString(),
-                            ForeColor = (this.content?.Data[px, py].IsDirty != false) ? Color.Red : Color.Black,
-                            Location = new Point((px + px / 3) * size, (py + py / 3) * size)
-                        };
-                        l.Show();
-                        p.Controls.Add(l);
-                        this.content?.Data[px, py].MarkClean();
+                            var l = new Label
+                            {
+                                Size = new Size((int)(size), 12),
+                                Text = (this.content?.Data[px, py].GetShort(true) ?? "?").ToString(),
+                                ForeColor = (this.content?.Data[px, py].IsDirty != false) ? Color.Red : Color.Black,
+                                Location = new Point((px + px / 3) * size, (py + py / 3) * size)
+                            };
+                            l.Show();
+                            this.p.Controls.Add(l);
+                            this.content?.Data[px, py].MarkClean();
+                        }
                     }
-                }
-                var lblControl = p.Parent.Controls.Find("lblValid", false).First();
-                lblControl.Text = "Valid: " + (valid ? "True" : "False");
-                lblControl.ForeColor = valid ? Color.Green : Color.Red;
-                p.Update();
-            });
+                    var lblControl = this.p.Parent.Controls.Find("lblValid", false).First();
+                    lblControl.Text = "Valid: " + (valid ? "True" : "False");
+                    lblControl.ForeColor = valid ? Color.Green : Color.Red;
+                    this.p.Update();
+                });
+            }
         }
     }
 }
