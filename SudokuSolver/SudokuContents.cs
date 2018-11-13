@@ -1,5 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
+﻿using System.Collections.Generic;
 using System.Linq;
 
 namespace SudokuSolver
@@ -8,7 +7,7 @@ namespace SudokuSolver
     {
         SudokuNumberStack[,] data;
         readonly int[] Arr1to9 = new int[] { 1, 2, 3, 4, 5, 6, 7, 8, 9 };
-        public SudokuNumberStack[,] Data => data;
+        public SudokuNumberStack[,] Data => this.data;
         int iteration = 0;
         int[] debug = { -1, -1 }; // -1 = disabled
 
@@ -17,7 +16,7 @@ namespace SudokuSolver
             var ret = new List<SudokuNumberStack>();
             for (int i = 0; i < 9; i++)
             {
-                ret.Add(data.GetValue(i, index) as SudokuNumberStack);
+                ret.Add(this.data.GetValue(i, index) as SudokuNumberStack);
             }
             return ret.ToArray();
         }
@@ -27,7 +26,7 @@ namespace SudokuSolver
             var ret = new List<SudokuNumberStack>();
             for (int i = 0; i < 9; i++)
             {
-                ret.Add(data.GetValue(index, i) as SudokuNumberStack);
+                ret.Add(this.data.GetValue(index, i) as SudokuNumberStack);
             }
             return ret.ToArray();
         }
@@ -37,28 +36,42 @@ namespace SudokuSolver
             var ret = new List<SudokuNumberStack>();
             for (int i = 0; i < 9; i++)
             {
-                ret.Add(data.GetValue((index % 3) * 3 + i % 3, (index / 3) * 3 + i / 3) as SudokuNumberStack);
+                ret.Add(this.data.GetValue((index % 3) * 3 + i % 3, (index / 3) * 3 + i / 3) as SudokuNumberStack);
             }
             return ret.ToArray();
+        }
+        public bool IsSolved()
+        {
+            for (int i = 0; i < 9; i++)
+            {
+                for (int j = 0; j < 9; j++)
+                {
+                    if (!this.data[i, j].IsFinished)
+                    {
+                        return false;
+                    }
+                }
+            }
+            return true;
         }
 
         public bool IsValid()
         {
             for (int i = 0; i < 9; i++)
             {
-                var ln = this.GetLine(i).Where(x => x.IsFinished);
+                var ln = GetLine(i).Where(x => x.IsFinished);
                 if (ln.Distinct().Count() != ln.Count())
                 {
                     return false;
                 }
 
-                var col = this.GetColumn(i).Where(x => x.IsFinished);
+                var col = GetColumn(i).Where(x => x.IsFinished);
                 if (col.Distinct().Count() != col.Count())
                 {
                     return false;
                 }
 
-                var sq = this.GetSquare(i).Where(x => x.IsFinished);
+                var sq = GetSquare(i).Where(x => x.IsFinished);
                 if (sq.Distinct().Count() != sq.Count())
                 {
                     return false;
@@ -69,23 +82,28 @@ namespace SudokuSolver
 
         public SudokuContents(int[,] knownValues)
         {
-            data = new SudokuNumberStack[9, 9];
+            this.data = new SudokuNumberStack[9, 9];
             for (int px = 0; px < 9; px++)
             {
                 for (int py = 0; py < 9; py++)
                 {
-                    data[px, py] = new SudokuNumberStack();
+                    this.data[px, py] = new SudokuNumberStack();
                     if (knownValues[px, py] != 0)
                     {
-                        data[px, py].SetNumber(knownValues[px, py]);
+                        this.data[px, py].SetNumber(knownValues[px, py]);
                     }
                 }
             }
         }
 
+        public SudokuContents(SudokuContents content)
+        {
+            this.data = content.Data;
+        }
+
         public bool RecheckValues()
         {
-            iteration++;
+            this.iteration++;
             bool checkChanged = false;
 
             if (checkChanged) // recalc
@@ -96,21 +114,21 @@ namespace SudokuSolver
             {
                 for (int px = 0; px < 9; px++) // columns
                 {
-                    if (!data[px, py].IsFinished)
+                    if (!this.data[px, py].IsFinished)
                     {
-                        var number = data[px, py];
+                        var number = this.data[px, py];
                         var ColumnVals = new List<int>();
 
                         for (int py2 = 0; py2 < 9; py2++)
                         {
-                            if (data[px, py2].IsFinished)
-                                ColumnVals.Add(data[px, py2].GetPossibleValues[0]);
+                            if (this.data[px, py2].IsFinished)
+                                ColumnVals.Add(this.data[px, py2].PossibleValues[0]);
                         }
 
 
-                        foreach (var num in data[px, py].GetPossibleValues.Where(x => ColumnVals.Contains(x)).ToList())
+                        foreach (var num in this.data[px, py].PossibleValues.Where(x => ColumnVals.Contains(x)).ToList())
                         {
-                            data[px, py].EliminateNumber(num);
+                            this.data[px, py].EliminateNumber(num);
                             checkChanged = true;
                         }
                     }
@@ -120,17 +138,17 @@ namespace SudokuSolver
                 var finished = new List<int>();
                 for (int px = 0; px < 9; px++)
                 {
-                    if (data[px, py].IsFinished)
-                        finished.Add(data[px, py].GetPossibleValues[0]);
+                    if (this.data[px, py].IsFinished)
+                        finished.Add(this.data[px, py].PossibleValues[0]);
                 }
                 if (finished.Count == 8)
                 {
                     for (int px = 0; px < 9; px++)
                     {
-                        if (!data[px, py].IsFinished)
+                        if (!this.data[px, py].IsFinished)
                         {
-                            data[px, py].SetNumber(Arr1to9.Except(finished).First());
-                            data[px, py].SetDirty();
+                            this.data[px, py].SetNumber(this.Arr1to9.Except(finished).First());
+                            this.data[px, py].SetDirty();
                             checkChanged = true;
                             break;
                         }
@@ -148,21 +166,21 @@ namespace SudokuSolver
                 // eliminate values
                 for (int py = 0; py < 9; py++) // lines
                 {
-                    if (!data[px, py].IsFinished) // if unknown
+                    if (!this.data[px, py].IsFinished) // if unknown
                     {
-                        var number = data[px, py];
+                        var number = this.data[px, py];
                         var ColumnVals = new List<int>();
 
                         for (int px2 = 0; px2 < 9; px2++)
                         {
-                            if (data[px2, py].IsFinished)
-                                ColumnVals.Add(data[px2, py].GetPossibleValues[0]);
+                            if (this.data[px2, py].IsFinished)
+                                ColumnVals.Add(this.data[px2, py].PossibleValues[0]);
                         }
 
 
-                        foreach (var num in data[px, py].GetPossibleValues.Where(x => ColumnVals.Contains(x)).ToList())
+                        foreach (var num in this.data[px, py].PossibleValues.Where(x => ColumnVals.Contains(x)).ToList())
                         {
-                            data[px, py].EliminateNumber(num);
+                            this.data[px, py].EliminateNumber(num);
                             checkChanged = true;
                         }
                     }
@@ -172,17 +190,17 @@ namespace SudokuSolver
                 var finished = new List<int>();
                 for (int py = 0; py < 9; py++)
                 {
-                    if (data[px, py].IsFinished)
-                        finished.Add(data[px, py].GetPossibleValues[0]);
+                    if (this.data[px, py].IsFinished)
+                        finished.Add(this.data[px, py].PossibleValues[0]);
                 }
                 if (finished.Count == 8)
                 {
                     for (int py = 0; py < 9; py++)
                     {
-                        if (!data[px, py].IsFinished)
+                        if (!this.data[px, py].IsFinished)
                         {
-                            data[px, py].SetNumber(Arr1to9.Except(finished).First());
-                            data[px, py].SetDirty();
+                            this.data[px, py].SetNumber(this.Arr1to9.Except(finished).First());
+                            this.data[px, py].SetDirty();
                             checkChanged = true;
                             break;
                         }
@@ -202,9 +220,9 @@ namespace SudokuSolver
                 {
                     for (int column = 0; column < 3; column++) // columns
                     {
-                        var number = data[offsetX + column, offsetY + line];
+                        var number = this.data[offsetX + column, offsetY + line];
                         if (number.IsFinished)
-                            finished.Add(number.GetPossibleValues[0]);
+                            finished.Add(number.PossibleValues[0]);
                     }
                 }
 
@@ -215,9 +233,9 @@ namespace SudokuSolver
                     {
                         foreach (var item in finished)
                         {
-                            if (!data[offsetX + px, offsetY + py].IsFinished && data[offsetX + px, offsetY + py].GetPossibleValues.Contains(item))
+                            if (!this.data[offsetX + px, offsetY + py].IsFinished && this.data[offsetX + px, offsetY + py].PossibleValues.Contains(item))
                             {
-                                data[offsetX + px, offsetY + py].EliminateNumber(item);
+                                this.data[offsetX + px, offsetY + py].EliminateNumber(item);
                                 checkChanged = true;
                             }
                         }
@@ -234,11 +252,11 @@ namespace SudokuSolver
                     {
                         for (int px = 0; px < 3; px++) // columns
                         {
-                            var number = data[offsetX + px, offsetY + py];
-                            if (!data[offsetX + px, offsetY + py].IsFinished)
+                            var number = this.data[offsetX + px, offsetY + py];
+                            if (!this.data[offsetX + px, offsetY + py].IsFinished)
                             {
-                                data[offsetX + px, offsetY + py].SetNumber(Arr1to9.Except(finished).First());
-                                data[offsetX + px, offsetY + py].SetDirty();
+                                this.data[offsetX + px, offsetY + py].SetNumber(this.Arr1to9.Except(finished).First());
+                                this.data[offsetX + px, offsetY + py].SetDirty();
                                 checkChanged = true;
                                 break;
                             }
@@ -252,14 +270,14 @@ namespace SudokuSolver
                     {
                         for (int px = 0; px < 3; px++) // columns
                         {
-                            slotValues.Add(data[offsetX + px, offsetY + py]);
+                            slotValues.Add(this.data[offsetX + px, offsetY + py]);
                         }
                     }
 
                     var setWherePossible = new List<int>();
                     for (int n = 1; n <= 9; n++)
                     {
-                        if (!slotValues.Any(y => y.IsFinished && y.GetPossibleValues[0] == n) && slotValues.Count(x => x.GetPossibleValues.Contains(n)) == 1)
+                        if (!slotValues.Any(y => y.IsFinished && y.PossibleValues[0] == n) && slotValues.Count(x => x.PossibleValues.Contains(n)) == 1)
                         {
                             setWherePossible.Add(n);
                         }
@@ -271,9 +289,9 @@ namespace SudokuSolver
                         {
                             for (int px = 0; px < 3; px++) // columns
                             {
-                                if (data[offsetX + px, offsetY + py].GetPossibleValues.Contains(item))
+                                if (this.data[offsetX + px, offsetY + py].PossibleValues.Contains(item))
                                 {
-                                    data[offsetX + px, offsetY + py].SetNumber(item);
+                                    this.data[offsetX + px, offsetY + py].SetNumber(item);
                                     checkChanged = true;
                                 }
                             }
